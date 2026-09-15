@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>จัดการงานอาสา</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+ 
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: #F4F7FC;
+    color: #1B2430;
+    display: flex;
+  }
+ 
+  h1, h2, h3 { font-family: 'Kanit', sans-serif; margin: 0; }
+ 
+  /* ---------- Admin sidebar ---------- */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: #182238;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+ 
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 8px 24px; margin-bottom: 16px;
+    border-bottom: 1px solid #2A3652;
+  }
+  .brand .logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #2F6FED, #14A38A);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .brand .logo svg { width: 18px; height: 18px; }
+  .brand span { font-family: 'Kanit', sans-serif; font-weight: 600; font-size: 15px; color: #fff; }
+  .brand .role-tag { font-size: 11px; color: #8AA0C8; margin-top: 2px; display: block; }
+ 
+  nav.nav-list { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #A9B6D0; font-size: 14px; font-weight: 500;
+    text-decoration: none; cursor: pointer;
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: #22304D; color: #fff; }
+  .nav-item.active { background: #2F6FED; color: #fff; }
+ 
+  .nav-logout {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #C88; font-size: 14px; font-weight: 500; cursor: pointer;
+    border-top: 1px solid #2A3652; margin-top: 8px; padding-top: 16px;
+  }
+  .nav-logout svg { width: 18px; height: 18px; }
+  .nav-logout:hover { color: #F08080; }
+ 
+  /* ---------- Main ---------- */
+  main { flex: 1; padding: 28px 36px 48px; max-width: 1100px; }
+ 
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .topbar h2 { font-size: 22px; color: #1B2430; }
+ 
+  .btn-new {
+    display: flex; align-items: center; gap: 8px;
+    background: #2F6FED; color: #fff; border: none; border-radius: 10px;
+    padding: 10px 18px; font-size: 14px; font-weight: 600; font-family: inherit;
+    cursor: pointer;
+  }
+  .btn-new svg { width: 16px; height: 16px; }
+  .btn-new:hover { background: #1F4FC4; }
+ 
+  /* ---------- Search + filter ---------- */
+  .search-row { display: flex; gap: 12px; margin-bottom: 18px; }
+  .search-box {
+    flex: 1; display: flex; align-items: center; gap: 10px;
+    background: #fff; border: 1px solid #E3E8F0; border-radius: 12px; padding: 0 14px;
+  }
+  .search-box svg { width: 18px; height: 18px; color: #8A99B3; flex-shrink: 0; }
+  .search-box input {
+    flex: 1; border: none; outline: none; background: transparent;
+    padding: 11px 0; font-size: 14px; font-family: inherit; color: #1B2430;
+  }
+  .search-box input::placeholder { color: #A8B4C7; }
+  .filter-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: #fff; border: 1px solid #E3E8F0; border-radius: 12px;
+    padding: 0 16px; font-size: 14px; font-weight: 500; color: #4B5768;
+    cursor: pointer; white-space: nowrap;
+  }
+  .filter-btn svg { width: 16px; height: 16px; }
+ 
+  /* ---------- Table ---------- */
+  .table-card {
+    background: #fff; border: 1px solid #E3E8F0; border-radius: 16px;
+    overflow: hidden; margin-bottom: 16px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left; font-size: 12.5px; font-weight: 600; color: #6B7686;
+    padding: 14px 18px; background: #F8FAFD; border-bottom: 1px solid #E3E8F0;
+  }
+  tbody td {
+    padding: 14px 18px; font-size: 13.5px; color: #1B2430;
+    border-bottom: 1px solid #EEF2F8; vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+ 
+  .row-title { font-weight: 600; }
+  .row-applicants { display: flex; align-items: center; gap: 6px; }
+  .row-applicants svg { width: 14px; height: 14px; color: #6B7686; }
+ 
+  .status-badge {
+    font-size: 12px; font-weight: 600; padding: 5px 12px;
+    border-radius: 999px; white-space: nowrap; display: inline-block;
+  }
+  .status-badge.open { background: #E7F7F1; color: #14A38A; }
+  .status-badge.full { background: #FFF4E0; color: #B4790A; }
+  .status-badge.closed { background: #FDECEC; color: #D64545; }
+ 
+  .action-icons { display: flex; gap: 6px; }
+  .icon-btn {
+    width: 30px; height: 30px; border-radius: 8px; border: 1px solid #E3E8F0;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #4B5768;
+  }
+  .icon-btn svg { width: 14px; height: 14px; }
+  .icon-btn:hover { background: #F0F5FF; color: #2F6FED; }
+  .icon-btn.danger:hover { background: #FDECEC; color: #D64545; }
+ 
+  /* ---------- Pagination ---------- */
+  .table-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; color: #6B7686;
+  }
+  .pagination { display: flex; align-items: center; gap: 6px; }
+  .page-btn {
+    width: 30px; height: 30px; border-radius: 8px; border: 1px solid #E3E8F0;
+    background: #fff; color: #4B5768; font-size: 13px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .page-btn.active { background: #2F6FED; border-color: #2F6FED; color: #fff; }
+  .page-btn svg { width: 14px; height: 14px; }
+ 
+  @media (max-width: 760px) {
+    .sidebar { display: none; }
+    main { padding: 20px; }
+    .table-card { overflow-x: auto; }
+    table { min-width: 620px; }
+  }
+</style>
+</head>
+<body>
+ 
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.5 1.33 9.6 3.55 11.8L12 20.24l8.45-8.44c2.22-2.2 2.09-5.3.19-7.22Z"></path>
+        </svg>
+      </div>
+      <div>
+        <span>ACTIHUB</span>
+        <span class="role-tag">แผงควบคุมแอดมิน</span>
+      </div>
+    </div>
+ 
+    <nav class="nav-list">
+      <a class="nav-item" href="admin-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"></path><path d="M5 10v10h14V10"></path></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="admin-users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        จัดการผู้ใช้
+      </a>
+      <a class="nav-item" href="post-activity.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+        โพสต์งานอาสา
+      </a>
+      <a class="nav-item active" href="manage-activities.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18M9 16h6"></path></svg>
+        จัดการงานอาสา
+      </a>
+      <a class="nav-item" href="admin-review-hours.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        ตรวจสอบชั่วโมง
+      </a>
+      <a class="nav-item" href="admin-reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18 17V9M13 17V5M8 17v-3"></path></svg>
+        รายงาน
+      </a>
+      <a class="nav-item" href="admin-settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg>
+        ตั้งค่า
+      </a>
+    </nav>
+ 
+    <div class="nav-logout" onclick="window.location.href='login.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      ออกจากระบบ
+    </div>
+  </aside>
+ 
+  <main>
+    <div class="topbar">
+      <h2>งานอาสาทั้งหมด</h2>
+      <button class="btn-new" onclick="window.location.href='post-activity.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+        โพสต์งานอาสา
+      </button>
+    </div>
+ 
+    <div class="search-row">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input type="text" placeholder="ค้นหาชื่องานอาสา">
+      </div>
+      <button class="filter-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
+        ตัวกรอง
+      </button>
+    </div>
+ 
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>ชื่องาน</th>
+            <th>วันที่</th>
+            <th>ผู้สมัคร</th>
+            <th>สถานะ</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody id="activitiesBody">
+          <tr><td colspan="5" style="text-align:center; color:#A8B4C7;">กำลังโหลด...</td></tr>
+        </tbody>
+      </table>
+    </div>
+ 
+    <div class="table-footer">
+      <span id="countLabel">กำลังโหลด...</span>
+    </div>
+  </main>
+ 
+  <script type="module">
+    import { auth, db, onAuthStateChanged, signOut, doc, getDoc, getDocs, collection, deleteDoc, orderBy, query } from './firebase-init.js';
+ 
+    document.querySelector('.nav-logout').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.href = 'login.html';
+    });
+ 
+    const statusLabel = {
+      open: ['เปิดรับสมัคร', 'open'],
+      full: ['เต็มแล้ว', 'full'],
+      closed: ['ปิดรับสมัคร', 'closed'],
+    };
+ 
+    async function loadActivities() {
+      const body = document.getElementById('activitiesBody');
+      const q = query(collection(db, 'activities'), orderBy('date', 'asc'));
+      const snap = await getDocs(q);
+ 
+      document.getElementById('countLabel').textContent = `ทั้งหมด ${snap.size} รายการ`;
+ 
+      if (snap.empty) {
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#A8B4C7;">ยังไม่มีงานอาสาที่โพสต์ไว้</td></tr>';
+        return;
+      }
+ 
+      body.innerHTML = snap.docs.map((d) => {
+        const a = d.data();
+        const [label, cls] = statusLabel[a.status] || ['เปิดรับสมัคร', 'open'];
+        return `
+          <tr>
+            <td class="row-title">${a.name || '-'}</td>
+            <td>${a.date || '-'}</td>
+            <td><span class="row-applicants">${a.applicants || 0} / ${a.spots || 0} คน</span></td>
+            <td><span class="status-badge ${cls}">${label}</span></td>
+            <td>
+              <div class="action-icons">
+                <button class="icon-btn danger" data-id="${d.id}" aria-label="ลบ">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"></path></svg>
+                </button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+ 
+      body.querySelectorAll('.icon-btn.danger').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('ยืนยันลบงานอาสานี้?')) return;
+          await deleteDoc(doc(db, 'activities', btn.dataset.id));
+          loadActivities();
+        });
+      });
+    }
+ 
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      const userSnap = await getDoc(doc(db, 'users', user.uid));
+      const role = userSnap.exists() ? userSnap.data().role : 'user';
+      if (role !== 'admin') {
+        alert('หน้านี้สำหรับแอดมินเท่านั้น');
+        window.location.href = 'dashboard.html';
+        return;
+      }
+      loadActivities();
+    });
+  </script>
+ 
+</body>
+</html>
+ 

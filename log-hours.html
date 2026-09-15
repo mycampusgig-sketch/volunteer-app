@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บันทึกชั่วโมง</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+ 
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: #F4F7FC;
+    color: #1B2430;
+    display: flex;
+  }
+ 
+  h1, h2, h3 { font-family: 'Kanit', sans-serif; margin: 0; }
+ 
+  /* ---------- Sidebar (shared) ---------- */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: #fff;
+    border-right: 1px solid #E3E8F0;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+ 
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 8px 24px; margin-bottom: 16px;
+    border-bottom: 1px solid #EEF2F8;
+  }
+  .brand .logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #2F6FED, #14A38A);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .brand .logo svg { width: 18px; height: 18px; }
+  .brand span { font-family: 'Kanit', sans-serif; font-weight: 600; font-size: 15px; color: #1B2430; }
+ 
+  nav.nav-list { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #4B5768; font-size: 14px; font-weight: 500;
+    text-decoration: none; cursor: pointer;
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: #F0F5FF; color: #2F6FED; }
+  .nav-item.active { background: #2F6FED; color: #fff; }
+ 
+  .nav-logout {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #8A5A5A; font-size: 14px; font-weight: 500; cursor: pointer;
+    border-top: 1px solid #EEF2F8; margin-top: 8px; padding-top: 16px;
+  }
+  .nav-logout svg { width: 18px; height: 18px; }
+  .nav-logout:hover { color: #D64545; }
+ 
+  /* ---------- Main ---------- */
+  main { flex: 1; padding: 28px 36px 48px; max-width: 720px; }
+ 
+  .topbar h2 { font-size: 22px; color: #1B2430; margin-bottom: 22px; }
+ 
+  .form-card {
+    background: #fff;
+    border: 1px solid #E3E8F0;
+    border-radius: 16px;
+    padding: 26px 28px;
+  }
+ 
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block; font-size: 14px; font-weight: 500; color: #1B2430; margin-bottom: 6px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    border: 1px solid #E3E8F0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1B2430;
+    background: #F8FAFD;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: #2F6FED; background: #fff;
+  }
+  .field textarea { resize: vertical; min-height: 90px; }
+ 
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+ 
+  /* ---------- Upload dropzone ---------- */
+  .dropzone {
+    border: 1.5px dashed #C7D6F0;
+    border-radius: 12px;
+    background: #F8FAFD;
+    padding: 22px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .dropzone svg { width: 26px; height: 26px; color: #2F6FED; margin-bottom: 8px; }
+  .dropzone .main-txt { font-size: 13.5px; color: #4B5768; font-weight: 500; }
+  .dropzone .sub-txt { font-size: 12px; color: #A8B4C7; margin-top: 4px; }
+ 
+  /* ---------- Summary bar ---------- */
+  .summary-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #F0F5FF;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin: 22px 0;
+  }
+  .summary-left { display: flex; align-items: center; gap: 10px; }
+  .summary-left svg { width: 20px; height: 20px; color: #2F6FED; }
+  .summary-num { font-family: 'Kanit', sans-serif; font-weight: 700; font-size: 16px; color: #1B2430; }
+  .summary-label { font-size: 12.5px; color: #6B7686; }
+  .summary-right { font-size: 12.5px; color: #6B7686; text-align: right; }
+ 
+  .btn-submit {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    background: #2F6FED;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .btn-submit:hover { background: #1F4FC4; }
+ 
+  @media (max-width: 760px) {
+    .sidebar { display: none; }
+    main { padding: 20px; }
+    .field-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+ 
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.5 1.33 9.6 3.55 11.8L12 20.24l8.45-8.44c2.22-2.2 2.09-5.3.19-7.22Z"></path>
+        </svg>
+      </div>
+      <span>ชื่อโครงการ</span>
+    </div>
+ 
+    <nav class="nav-list">
+      <a class="nav-item" href="dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"></path><path d="M5 10v10h14V10"></path></svg>
+        หน้าหลัก
+      </a>
+      <a class="nav-item" href="browse-activities.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        รับงานอาสา
+      </a>
+      <a class="nav-item active" href="log-hours.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 8v4l3 2"></path></svg>
+        บันทึกชั่วโมง
+      </a>
+      <a class="nav-item" href="hour-history.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"></path><path d="M3.05 13a9 9 0 1 0 .5-4.5L3 8"></path><path d="M12 7v5l3 3"></path></svg>
+        ประวัติชั่วโมง
+      </a>
+      <a class="nav-item" href="profile.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        โปรไฟล์
+      </a>
+      <a class="nav-item" href="settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg>
+        ตั้งค่า
+      </a>
+      <a class="nav-item" id="adminLink" href="admin-review-hours.html" style="display:none; color:#B4790A;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 3.8 9 9 10 5.2-1 9-5 9-10V6l-9-4Z"></path></svg>
+        แผงควบคุมแอดมิน
+      </a>
+    </nav>
+ 
+    <div class="nav-logout" onclick="window.location.href='login.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      ออกจากระบบ
+    </div>
+  </aside>
+ 
+  <main>
+    <div class="topbar"><h2>บันทึกชั่วโมงกิจกรรม</h2></div>
+ 
+    <div class="form-card">
+      <form id="logHoursForm">
+        <div class="field">
+          <label for="activityName">ชื่อกิจกรรม *</label>
+          <input type="text" id="activityName" placeholder="กรอกชื่อกิจกรรม">
+        </div>
+ 
+        <div class="field-row">
+          <div class="field">
+            <label for="activityDate">วันที่ทำกิจกรรม *</label>
+            <input type="date" id="activityDate">
+          </div>
+          <div class="field">
+            <label for="activityTime">เวลาเริ่ม - เวลาสิ้นสุด *</label>
+            <input type="text" id="activityTime" placeholder="09:00 - 12:00">
+          </div>
+        </div>
+ 
+        <div class="field-row">
+          <div class="field">
+            <label for="activityHours">จำนวนชั่วโมง *</label>
+            <input type="number" id="activityHours" min="0" step="0.5" placeholder="เช่น 3">
+          </div>
+          <div class="field">
+            <label for="activityPlace">สถานที่</label>
+            <input type="text" id="activityPlace" placeholder="ระบุสถานที่ทำกิจกรรม">
+          </div>
+        </div>
+ 
+        <div class="field">
+          <label for="activityDesc">รายละเอียดกิจกรรม</label>
+          <textarea id="activityDesc" placeholder="อธิบายสิ่งที่ทำในกิจกรรมนี้โดยย่อ"></textarea>
+        </div>
+ 
+        <div class="field">
+          <label>อัปโหลดหลักฐาน (รูปภาพ)</label>
+          <div class="dropzone" id="dropzone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M17 8l-5-5-5 5"></path><path d="M12 3v12"></path></svg>
+            <div class="main-txt">คลิกหรือลากไฟล์ไฟล์ที่นี่</div>
+            <div class="sub-txt">รองรับไฟล์ .JPG, .PNG (ไม่เกิน 5MB)</div>
+            <input type="file" id="fileInput" accept="image/png, image/jpeg" style="display:none;">
+          </div>
+        </div>
+ 
+        <div class="summary-bar">
+          <div class="summary-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 8v4l3 2"></path></svg>
+            <div>
+              <div class="summary-num" id="summaryNum">-- ชั่วโมง</div>
+              <div class="summary-label">ชั่วโมงสะสมทั้งหมด</div>
+            </div>
+          </div>
+          <div class="summary-right" id="summaryRight">กำลังโหลด...</div>
+        </div>
+ 
+        <div class="notice" id="notice" style="display:none; font-size:13px; padding:10px 12px; border-radius:8px; margin-bottom:14px;"></div>
+ 
+        <button type="submit" class="btn-submit">ส่งข้อมูลเพื่อตรวจสอบ</button>
+      </form>
+    </div>
+  </main>
+ 
+  <script type="module">
+    import { auth, db, supabase, onAuthStateChanged, signOut, doc, getDoc, addDoc, updateDoc, collection, query, where, getDocs, serverTimestamp } from './firebase-init.js';
+ 
+    document.querySelector('.nav-logout').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.href = 'login.html';
+    });
+ 
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    dropzone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        dropzone.querySelector('.main-txt').textContent = fileInput.files[0].name;
+      }
+    });
+ 
+    const form = document.getElementById('logHoursForm');
+    const notice = document.getElementById('notice');
+    const submitBtn = form.querySelector('.btn-submit');
+ 
+    function showNotice(msg, isError) {
+      notice.textContent = msg;
+      notice.style.display = 'block';
+      notice.style.background = isError ? '#FDECEC' : '#E7F7F1';
+      notice.style.color = isError ? '#D64545' : '#14A38A';
+    }
+ 
+    let currentUser = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const linkedActivityId = urlParams.get('activityId');
+    const linkedActivityName = urlParams.get('activityName');
+    if (linkedActivityName) {
+      document.getElementById('activityName').value = decodeURIComponent(linkedActivityName);
+    }
+ 
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      currentUser = user;
+ 
+      const userSnap = await getDoc(doc(db, 'users', user.uid));
+      const userData = userSnap.exists() ? userSnap.data() : { totalHours: 0, targetHours: 60 };
+ 
+      if (userData.role === 'admin') {
+        document.getElementById('adminLink').style.display = 'flex';
+      }
+      const totalHours = userData.totalHours || 0;
+      const targetHours = userData.targetHours || 60;
+      const remain = Math.max(targetHours - totalHours, 0);
+ 
+      document.getElementById('summaryNum').textContent = `${totalHours} ชั่วโมง`;
+      document.getElementById('summaryRight').innerHTML = `เหลืออีก ${remain} ชั่วโมง<br>จากเป้าหมาย ${targetHours} ชั่วโมง`;
+    });
+ 
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+ 
+      const activityName = document.getElementById('activityName').value.trim();
+      const activityDate = document.getElementById('activityDate').value;
+      const activityTime = document.getElementById('activityTime').value.trim();
+      const activityHours = parseFloat(document.getElementById('activityHours').value);
+      const activityPlace = document.getElementById('activityPlace').value.trim();
+      const activityDesc = document.getElementById('activityDesc').value.trim();
+      const file = fileInput.files[0];
+ 
+      if (!activityName || !activityDate || !activityTime || !activityHours) {
+        showNotice('กรอกข้อมูลที่มี * ให้ครบก่อนนะครับ', true);
+        return;
+      }
+ 
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'กำลังส่งข้อมูล...';
+ 
+      try {
+        let photoUrl = null;
+ 
+        // อัปโหลดรูปหลักฐานขึ้น Supabase Storage (ถ้ามีไฟล์แนบ)
+        if (file) {
+          const filePath = `${currentUser.uid}/${Date.now()}-${file.name}`;
+          const { error: uploadError } = await supabase.storage
+            .from('evidence-photos')
+            .upload(filePath, file);
+ 
+          if (uploadError) throw new Error('อัปโหลดรูปไม่สำเร็จ: ' + uploadError.message);
+ 
+          const { data: publicUrlData } = supabase.storage
+            .from('evidence-photos')
+            .getPublicUrl(filePath);
+          photoUrl = publicUrlData.publicUrl;
+        }
+ 
+        // บันทึกข้อมูลลง Firestore (สถานะเริ่มต้น "pending" ตามที่ Security Rules กำหนดไว้)
+        await addDoc(collection(db, 'hourLogs'), {
+          userId: currentUser.uid,
+          activityId: linkedActivityId || null,
+          activityName,
+          date: activityDate,
+          time: activityTime,
+          hours: activityHours,
+          place: activityPlace,
+          description: activityDesc,
+          photoUrl,
+          status: 'pending',
+          createdAt: serverTimestamp(),
+        });
+ 
+        // ถ้ามาจากการสมัครกิจกรรมจริง (มี activityId) ให้ปรับสถานะการสมัครเป็น "attended"
+        if (linkedActivityId) {
+          try {
+            const regQuery = query(
+              collection(db, 'registrations'),
+              where('activityId', '==', linkedActivityId),
+              where('userId', '==', currentUser.uid)
+            );
+            const regSnap = await getDocs(regQuery);
+            if (!regSnap.empty) {
+              await updateDoc(doc(db, 'registrations', regSnap.docs[0].id), { status: 'attended' });
+            }
+          } catch (regErr) {
+            console.error('อัปเดตสถานะการสมัครไม่สำเร็จ (ไม่กระทบการบันทึกชั่วโมงหลัก):', regErr);
+          }
+        }
+ 
+ 
+        showNotice('ส่งข้อมูลเรียบร้อย รอแอดมินตรวจสอบนะคะ', false);
+        form.reset();
+        dropzone.querySelector('.main-txt').textContent = 'คลิกหรือลากไฟล์ไฟล์ที่นี่';
+        setTimeout(() => { window.location.href = 'hour-history.html'; }, 1200);
+      } catch (err) {
+        showNotice(err.message || 'ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่', true);
+        console.error(err);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'ส่งข้อมูลเพื่อตรวจสอบ';
+      }
+    });
+  </script>
+ 
+</body>
+</html>
+ 

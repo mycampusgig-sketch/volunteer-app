@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โพสต์งานอาสา</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+ 
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: #F4F7FC;
+    color: #1B2430;
+    display: flex;
+  }
+ 
+  h1, h2, h3 { font-family: 'Kanit', sans-serif; margin: 0; }
+ 
+  /* ---------- Admin sidebar ---------- */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: #182238;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+ 
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 8px 24px; margin-bottom: 16px;
+    border-bottom: 1px solid #2A3652;
+  }
+  .brand .logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #2F6FED, #14A38A);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .brand .logo svg { width: 18px; height: 18px; }
+  .brand span { font-family: 'Kanit', sans-serif; font-weight: 600; font-size: 15px; color: #fff; }
+  .brand .role-tag { font-size: 11px; color: #8AA0C8; margin-top: 2px; display: block; }
+ 
+  nav.nav-list { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #A9B6D0; font-size: 14px; font-weight: 500;
+    text-decoration: none; cursor: pointer;
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: #22304D; color: #fff; }
+  .nav-item.active { background: #2F6FED; color: #fff; }
+ 
+  .nav-logout {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #C88; font-size: 14px; font-weight: 500; cursor: pointer;
+    border-top: 1px solid #2A3652; margin-top: 8px; padding-top: 16px;
+  }
+  .nav-logout svg { width: 18px; height: 18px; }
+  .nav-logout:hover { color: #F08080; }
+ 
+  /* ---------- Main ---------- */
+  main { flex: 1; padding: 28px 36px 48px; max-width: 760px; }
+ 
+  .topbar h2 { font-size: 22px; color: #1B2430; margin-bottom: 22px; }
+ 
+  .form-card {
+    background: #fff;
+    border: 1px solid #E3E8F0;
+    border-radius: 16px;
+    padding: 26px 28px;
+  }
+ 
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 14px; font-weight: 500; color: #1B2430; margin-bottom: 6px; }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    border: 1px solid #E3E8F0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1B2430;
+    background: #F8FAFD;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: #2F6FED; background: #fff;
+  }
+  .field textarea { resize: vertical; min-height: 100px; }
+ 
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+ 
+  .btn-row { display: flex; gap: 10px; margin-top: 22px; }
+  .btn-cancel {
+    flex: 1; padding: 12px; border: 1px solid #E3E8F0; border-radius: 10px;
+    background: #fff; color: #4B5768; font-size: 14px; font-weight: 500;
+    font-family: inherit; cursor: pointer;
+  }
+  .btn-cancel:hover { background: #F8FAFD; }
+  .btn-draft {
+    flex: 1; padding: 12px; border: 1px solid #2F6FED; border-radius: 10px;
+    background: #fff; color: #2F6FED; font-size: 14px; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+  }
+  .btn-draft:hover { background: #F0F5FF; }
+  .btn-publish {
+    flex: 1; padding: 12px; border: none; border-radius: 10px;
+    background: #2F6FED; color: #fff; font-size: 14px; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+  }
+  .btn-publish:hover { background: #1F4FC4; }
+ 
+  @media (max-width: 760px) {
+    .sidebar { display: none; }
+    main { padding: 20px; }
+    .field-row, .field-row-3 { grid-template-columns: 1fr; }
+    .btn-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+ 
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.5 1.33 9.6 3.55 11.8L12 20.24l8.45-8.44c2.22-2.2 2.09-5.3.19-7.22Z"></path>
+        </svg>
+      </div>
+      <div>
+        <span>ชื่อโครงการ</span>
+        <span class="role-tag">แผงควบคุมแอดมิน</span>
+      </div>
+    </div>
+ 
+    <nav class="nav-list">
+      <a class="nav-item" href="admin-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"></path><path d="M5 10v10h14V10"></path></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="admin-users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        จัดการผู้ใช้
+      </a>
+      <a class="nav-item active" href="post-activity.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+        โพสต์งานอาสา
+      </a>
+      <a class="nav-item" href="manage-activities.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18M9 16h6"></path></svg>
+        จัดการงานอาสา
+      </a>
+      <a class="nav-item" href="admin-review-hours.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        ตรวจสอบชั่วโมง
+      </a>
+      <a class="nav-item" href="admin-reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18 17V9M13 17V5M8 17v-3"></path></svg>
+        รายงาน
+      </a>
+      <a class="nav-item" href="admin-settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg>
+        ตั้งค่า
+      </a>
+    </nav>
+ 
+    <div class="nav-logout" onclick="window.location.href='login.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      ออกจากระบบ
+    </div>
+  </aside>
+ 
+  <main>
+    <div class="topbar"><h2>โพสต์งานอาสา</h2></div>
+ 
+    <div class="form-card">
+      <form id="postActivityForm">
+        <div class="field">
+          <label for="activityName">ชื่อกิจกรรม *</label>
+          <input type="text" id="activityName" placeholder="กรอกชื่อกิจกรรม">
+        </div>
+ 
+        <div class="field">
+          <label for="activityType">ประเภทกิจกรรม *</label>
+          <select id="activityType">
+            <option value="">เลือกประเภทกิจกรรม</option>
+            <option value="environment">สิ่งแวดล้อม</option>
+            <option value="elderly">ผู้สูงอายุ</option>
+            <option value="education">การศึกษา</option>
+            <option value="other">อื่นๆ</option>
+          </select>
+        </div>
+ 
+        <div class="field-row">
+          <div class="field">
+            <label for="activityDate">วันที่จัดกิจกรรม *</label>
+            <input type="date" id="activityDate">
+          </div>
+          <div class="field">
+            <label for="activityTime">เวลาเริ่ม - เวลาสิ้นสุด *</label>
+            <input type="text" id="activityTime" placeholder="09:00 - 12:00">
+          </div>
+        </div>
+ 
+        <div class="field">
+          <label for="activityPlace">สถานที่ *</label>
+          <input type="text" id="activityPlace" placeholder="ระบุสถานที่ทำกิจกรรม">
+        </div>
+ 
+        <div class="field-row-3">
+          <div class="field">
+            <label for="activitySpots">จำนวนที่รับ *</label>
+            <input type="number" id="activitySpots" min="1" placeholder="เช่น 20">
+          </div>
+          <div class="field">
+            <label for="activityHours">จำนวนชั่วโมง *</label>
+            <input type="number" id="activityHours" min="0" step="0.5" placeholder="เช่น 4">
+          </div>
+        </div>
+ 
+        <div class="field">
+          <label for="activityDesc">รายละเอียดกิจกรรม *</label>
+          <textarea id="activityDesc" placeholder="อธิบายรายละเอียดกิจกรรม สิ่งที่ได้รับ และสิ่งที่ต้องเตรียม"></textarea>
+        </div>
+ 
+        <div class="btn-row">
+          <button type="button" class="btn-cancel" onclick="window.location.href='manage-activities.html'">ยกเลิก</button>
+          <button type="button" class="btn-draft">บันทึกร่าง</button>
+          <button type="submit" class="btn-publish">เผยแพร่</button>
+        </div>
+      </form>
+    </div>
+  </main>
+ 
+  <script type="module">
+    import { auth, db, onAuthStateChanged, signOut, doc, getDoc, addDoc, collection, serverTimestamp } from './firebase-init.js';
+ 
+    document.querySelector('.nav-logout').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.href = 'login.html';
+    });
+ 
+    // ตรวจสอบว่าล็อกอินอยู่ และมี role เป็น admin เท่านั้นถึงจะเข้าหน้านี้ได้
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      const userSnap = await getDoc(doc(db, 'users', user.uid));
+      const role = userSnap.exists() ? userSnap.data().role : 'user';
+      if (role !== 'admin') {
+        alert('หน้านี้สำหรับแอดมินเท่านั้น');
+        window.location.href = 'dashboard.html';
+      }
+    });
+ 
+    const form = document.getElementById('postActivityForm');
+    const submitBtn = form.querySelector('.btn-publish');
+ 
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+ 
+      const name = document.getElementById('activityName').value.trim();
+      const type = document.getElementById('activityType').value;
+      const date = document.getElementById('activityDate').value;
+      const time = document.getElementById('activityTime').value.trim();
+      const place = document.getElementById('activityPlace').value.trim();
+      const spots = parseInt(document.getElementById('activitySpots').value, 10);
+      const hours = parseFloat(document.getElementById('activityHours').value);
+      const description = document.getElementById('activityDesc').value.trim();
+ 
+      if (!name || !type || !date || !time || !place || !spots || !hours || !description) {
+        alert('กรอกข้อมูลที่มี * ให้ครบก่อนนะครับ');
+        return;
+      }
+ 
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'กำลังเผยแพร่...';
+ 
+      try {
+        await addDoc(collection(db, 'activities'), {
+          name, type, date, time, place, spots, hours, description,
+          applicants: 0,
+          status: 'open',
+          createdAt: serverTimestamp(),
+        });
+        alert('เผยแพร่งานอาสาเรียบร้อยแล้ว');
+        window.location.href = 'manage-activities.html';
+      } catch (err) {
+        alert('เผยแพร่ไม่สำเร็จ: ' + err.message);
+        console.error(err);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'เผยแพร่';
+      }
+    });
+  </script>
+ 
+</body>
+</html>
+ 

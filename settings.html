@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตั้งค่า</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+ 
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: #F4F7FC;
+    color: #1B2430;
+    display: flex;
+  }
+ 
+  h1, h2, h3 { font-family: 'Kanit', sans-serif; margin: 0; }
+ 
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    width: 240px; flex-shrink: 0; background: #fff; border-right: 1px solid #E3E8F0;
+    display: flex; flex-direction: column; padding: 24px 16px; height: 100vh;
+    position: sticky; top: 0;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 24px; margin-bottom: 16px; border-bottom: 1px solid #EEF2F8; }
+  .brand .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2F6FED, #14A38A); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand .logo svg { width: 18px; height: 18px; }
+  .brand span { font-family: 'Kanit', sans-serif; font-weight: 600; font-size: 15px; color: #1B2430; }
+  nav.nav-list { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; color: #4B5768; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: #F0F5FF; color: #2F6FED; }
+  .nav-item.active { background: #2F6FED; color: #fff; }
+  .nav-logout { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; color: #8A5A5A; font-size: 14px; font-weight: 500; cursor: pointer; border-top: 1px solid #EEF2F8; margin-top: 8px; padding-top: 16px; }
+  .nav-logout svg { width: 18px; height: 18px; }
+  .nav-logout:hover { color: #D64545; }
+ 
+  /* ---------- Main ---------- */
+  main { flex: 1; padding: 28px 36px 48px; max-width: 640px; }
+  .topbar h2 { font-size: 22px; color: #1B2430; margin-bottom: 22px; }
+ 
+  .settings-card {
+    background: #fff; border: 1px solid #E3E8F0; border-radius: 16px;
+    padding: 26px 28px; margin-bottom: 20px;
+  }
+  .settings-card h3 { font-size: 15px; margin-bottom: 16px; }
+  .settings-card .desc { font-size: 12.5px; color: #6B7686; margin: -10px 0 16px; }
+ 
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 14px; font-weight: 500; color: #1B2430; margin-bottom: 6px; }
+  .field input {
+    width: 100%; border: 1px solid #E3E8F0; border-radius: 10px; padding: 10px 12px;
+    font-size: 14px; font-family: inherit; color: #1B2430; background: #F8FAFD;
+  }
+  .field input:focus { outline: none; border-color: #2F6FED; background: #fff; }
+ 
+  .btn-save {
+    padding: 11px 22px; border: none; border-radius: 10px; background: #2F6FED;
+    color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer;
+  }
+  .btn-save:hover { background: #1F4FC4; }
+ 
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid #EEF2F8; font-size: 14px;
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-row .label { font-weight: 500; }
+  .toggle-row .sub { font-size: 12px; color: #6B7686; margin-top: 2px; }
+ 
+  .switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .slider {
+    position: absolute; cursor: pointer; inset: 0; background: #D7E2F2;
+    border-radius: 999px; transition: 0.15s;
+  }
+  .switch .slider::before {
+    content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px;
+    background: #fff; border-radius: 50%; transition: 0.15s;
+  }
+  .switch input:checked + .slider { background: #2F6FED; }
+  .switch input:checked + .slider::before { transform: translateX(18px); }
+ 
+  .notice { font-size: 13px; padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; display: none; }
+ 
+  .danger-zone { border-color: #F3C6C6; }
+  .btn-danger {
+    padding: 10px 18px; border: 1px solid #F3C6C6; border-radius: 10px; background: #fff;
+    color: #D64545; font-size: 13.5px; font-weight: 600; font-family: inherit; cursor: pointer;
+  }
+  .btn-danger:hover { background: #FDECEC; }
+ 
+  @media (max-width: 760px) {
+    .sidebar { display: none; }
+    main { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+ 
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.5 1.33 9.6 3.55 11.8L12 20.24l8.45-8.44c2.22-2.2 2.09-5.3.19-7.22Z"></path>
+        </svg>
+      </div>
+      <span>ชื่อโครงการ</span>
+    </div>
+ 
+    <nav class="nav-list">
+      <a class="nav-item" href="dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"></path><path d="M5 10v10h14V10"></path></svg>
+        หน้าหลัก
+      </a>
+      <a class="nav-item" href="browse-activities.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        รับงานอาสา
+      </a>
+      <a class="nav-item" href="log-hours.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 8v4l3 2"></path></svg>
+        บันทึกชั่วโมง
+      </a>
+      <a class="nav-item" href="hour-history.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"></path><path d="M3.05 13a9 9 0 1 0 .5-4.5L3 8"></path><path d="M12 7v5l3 3"></path></svg>
+        ประวัติชั่วโมง
+      </a>
+      <a class="nav-item" href="profile.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        โปรไฟล์
+      </a>
+      <a class="nav-item active" href="settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg>
+        ตั้งค่า
+      </a>
+      <a class="nav-item" id="adminLink" href="admin-review-hours.html" style="display:none; color:#B4790A;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 3.8 9 9 10 5.2-1 9-5 9-10V6l-9-4Z"></path></svg>
+        แผงควบคุมแอดมิน
+      </a>
+    </nav>
+ 
+    <div class="nav-logout" id="logoutBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      ออกจากระบบ
+    </div>
+  </aside>
+ 
+  <main>
+    <div class="topbar"><h2>ตั้งค่า</h2></div>
+ 
+    <div class="settings-card">
+      <h3>เปลี่ยนรหัสผ่าน</h3>
+      <div class="notice" id="pwNotice"></div>
+      <form id="pwForm">
+        <div class="field">
+          <label for="currentPw">รหัสผ่านปัจจุบัน</label>
+          <input type="password" id="currentPw" required>
+        </div>
+        <div class="field">
+          <label for="newPw">รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)</label>
+          <input type="password" id="newPw" required>
+        </div>
+        <button type="submit" class="btn-save">เปลี่ยนรหัสผ่าน</button>
+      </form>
+    </div>
+ 
+    <div class="settings-card">
+      <h3>การแจ้งเตือน</h3>
+      <p class="desc">ปิดเปิดได้ตามต้องการ (เป็นเทมเพลตตัวอย่าง ยังไม่ได้เชื่อมระบบแจ้งเตือนจริง)</p>
+      <div class="toggle-row">
+        <div>
+          <div class="label">แจ้งเตือนกิจกรรมใหม่</div>
+          <div class="sub">แจ้งเมื่อมีงานอาสาโพสต์ใหม่</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="label">แจ้งเตือนผลการตรวจสอบ</div>
+          <div class="sub">แจ้งเมื่อแอดมินอนุมัติ/ไม่อนุมัติชั่วโมง</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+ 
+    <div class="settings-card danger-zone">
+      <h3>ออกจากระบบ</h3>
+      <p class="desc">ออกจากระบบในอุปกรณ์นี้</p>
+      <button class="btn-danger" id="logoutBtn2">ออกจากระบบ</button>
+    </div>
+  </main>
+ 
+  <script type="module">
+    import { auth, db, onAuthStateChanged, signOut, doc, getDoc, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from './firebase-init.js';
+ 
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = 'login.html';
+    });
+    document.getElementById('logoutBtn2').addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = 'login.html';
+    });
+ 
+    const pwNotice = document.getElementById('pwNotice');
+    function showPwNotice(msg, isError) {
+      pwNotice.textContent = msg;
+      pwNotice.style.display = 'block';
+      pwNotice.style.background = isError ? '#FDECEC' : '#E7F7F1';
+      pwNotice.style.color = isError ? '#D64545' : '#14A38A';
+    }
+ 
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      const userSnap = await getDoc(doc(db, 'users', user.uid));
+      if (userSnap.exists() && userSnap.data().role === 'admin') {
+        document.getElementById('adminLink').style.display = 'flex';
+      }
+    });
+ 
+    document.getElementById('pwForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const currentPw = document.getElementById('currentPw').value;
+      const newPw = document.getElementById('newPw').value;
+ 
+      if (newPw.length < 6) {
+        showPwNotice('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร', true);
+        return;
+      }
+ 
+      const user = auth.currentUser;
+      try {
+        // Firebase บังคับให้ยืนยันตัวตนด้วยรหัสผ่านเดิมก่อน ถึงจะเปลี่ยนรหัสผ่านได้
+        const credential = EmailAuthProvider.credential(user.email, currentPw);
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, newPw);
+        showPwNotice('เปลี่ยนรหัสผ่านเรียบร้อยแล้ว', false);
+        document.getElementById('pwForm').reset();
+      } catch (err) {
+        const msg = err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password'
+          ? 'รหัสผ่านปัจจุบันไม่ถูกต้อง'
+          : 'เปลี่ยนรหัสผ่านไม่สำเร็จ: ' + err.message;
+        showPwNotice(msg, true);
+      }
+    });
+  </script>
+ 
+</body>
+</html>
+ 

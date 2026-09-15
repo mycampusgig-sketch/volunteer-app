@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard แอดมิน</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+ 
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: #F4F7FC;
+    color: #1B2430;
+    display: flex;
+  }
+ 
+  h1, h2, h3 { font-family: 'Kanit', sans-serif; margin: 0; }
+ 
+  /* ---------- Admin sidebar ---------- */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: #182238;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 8px 24px; margin-bottom: 16px;
+    border-bottom: 1px solid #2A3652;
+  }
+  .brand .logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #2F6FED, #14A38A);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .brand .logo svg { width: 18px; height: 18px; }
+  .brand span { font-family: 'Kanit', sans-serif; font-weight: 600; font-size: 15px; color: #fff; }
+  .brand .role-tag { font-size: 11px; color: #8AA0C8; margin-top: 2px; display: block; }
+ 
+  nav.nav-list { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #A9B6D0; font-size: 14px; font-weight: 500;
+    text-decoration: none; cursor: pointer;
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: #22304D; color: #fff; }
+  .nav-item.active { background: #2F6FED; color: #fff; }
+ 
+  .nav-logout {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #C88; font-size: 14px; font-weight: 500; cursor: pointer;
+    border-top: 1px solid #2A3652; margin-top: 8px; padding-top: 16px;
+  }
+  .nav-logout svg { width: 18px; height: 18px; }
+  .nav-logout:hover { color: #F08080; }
+ 
+  /* ---------- Main ---------- */
+  main { flex: 1; padding: 28px 36px 48px; max-width: 1000px; }
+ 
+  .topbar h2 { font-size: 22px; color: #1B2430; margin-bottom: 4px; }
+  .topbar p { margin: 0 0 22px; font-size: 13.5px; color: #6B7686; }
+ 
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+ 
+  .stat-card {
+    background: #fff;
+    border: 1px solid #E3E8F0;
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+ 
+  .stat-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .stat-icon svg { width: 20px; height: 20px; color: #fff; }
+  .stat-icon.blue { background: #2F6FED; }
+  .stat-icon.teal { background: #14A38A; }
+  .stat-icon.orange { background: #E08A2C; }
+  .stat-icon.purple { background: #8B5CF6; }
+ 
+  .stat-num { font-family: 'Kanit', sans-serif; font-size: 20px; font-weight: 700; color: #1B2430; line-height: 1.2; }
+  .stat-label { font-size: 12.5px; color: #6B7686; margin-top: 2px; }
+ 
+  .quick-links {
+    background: #fff;
+    border: 1px solid #E3E8F0;
+    border-radius: 16px;
+    padding: 20px 22px;
+  }
+  .quick-links h3 { font-size: 15px; margin-bottom: 14px; }
+  .quick-link-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid #EEF2F8; font-size: 14px;
+  }
+  .quick-link-row:last-child { border-bottom: none; }
+  .quick-link-row a {
+    color: #2F6FED; font-weight: 500; text-decoration: none; font-size: 13px;
+  }
+  .quick-link-row a:hover { text-decoration: underline; }
+ 
+  @media (max-width: 900px) {
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .sidebar { display: none; }
+    main { padding: 20px; }
+    .stat-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+ 
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.5 1.33 9.6 3.55 11.8L12 20.24l8.45-8.44c2.22-2.2 2.09-5.3.19-7.22Z"></path>
+        </svg>
+      </div>
+      <div>
+        <span>ACTIHUB</span>
+        <span class="role-tag">แผงควบคุมแอดมิน</span>
+      </div>
+    </div>
+ 
+    <nav class="nav-list">
+      <a class="nav-item active" href="admin-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"></path><path d="M5 10v10h14V10"></path></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="admin-users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        จัดการผู้ใช้
+      </a>
+      <a class="nav-item" href="post-activity.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+        โพสต์งานอาสา
+      </a>
+      <a class="nav-item" href="manage-activities.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18M9 16h6"></path></svg>
+        จัดการงานอาสา
+      </a>
+      <a class="nav-item" href="admin-review-hours.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        ตรวจสอบชั่วโมง
+      </a>
+    </nav>
+ 
+    <div class="nav-logout" id="logoutBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      ออกจากระบบ
+    </div>
+  </aside>
+ 
+  <main>
+    <div class="topbar">
+      <h2>ภาพรวมระบบ</h2>
+      <p>สรุปตัวเลขสำคัญของโครงการทั้งหมด</p>
+    </div>
+ 
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+        </div>
+        <div>
+          <div class="stat-num" id="statUsers">--</div>
+          <div class="stat-label">ผู้ใช้ทั้งหมด</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon teal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18M9 16h6"></path></svg>
+        </div>
+        <div>
+          <div class="stat-num" id="statActivities">--</div>
+          <div class="stat-label">งานอาสาที่โพสต์</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 8v4l3 2"></path></svg>
+        </div>
+        <div>
+          <div class="stat-num" id="statPending">--</div>
+          <div class="stat-label">รอตรวจสอบชั่วโมง</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="M22 4 12 14.01l-3-3"></path></svg>
+        </div>
+        <div>
+          <div class="stat-num" id="statTotalHours">--</div>
+          <div class="stat-label">ชั่วโมงอาสารวมทั้งหมด</div>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="quick-links">
+      <h3>ทางลัด</h3>
+      <div class="quick-link-row">
+        <span>โพสต์งานอาสาใหม่</span>
+        <a href="post-activity.html">ไปที่หน้าโพสต์งาน →</a>
+      </div>
+      <div class="quick-link-row">
+        <span>ตรวจสอบคำขอบันทึกชั่วโมงที่ค้างอยู่</span>
+        <a href="admin-review-hours.html">ไปตรวจสอบ →</a>
+      </div>
+      <div class="quick-link-row">
+        <span>ดู/จัดการรายชื่อผู้ใช้ทั้งหมด</span>
+        <a href="admin-users.html">ไปจัดการผู้ใช้ →</a>
+      </div>
+    </div>
+  </main>
+ 
+  <script type="module">
+    import { auth, db, onAuthStateChanged, signOut, doc, getDoc, collection, getDocs, query, where } from './firebase-init.js';
+ 
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = 'login.html';
+    });
+ 
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      const userSnap = await getDoc(doc(db, 'users', user.uid));
+      const role = userSnap.exists() ? userSnap.data().role : 'user';
+      if (role !== 'admin') {
+        alert('หน้านี้สำหรับแอดมินเท่านั้น');
+        window.location.href = 'dashboard.html';
+        return;
+      }
+ 
+      try {
+        const usersSnap = await getDocs(collection(db, 'users'));
+        document.getElementById('statUsers').textContent = usersSnap.size;
+ 
+        let totalHours = 0;
+        usersSnap.forEach((d) => { totalHours += d.data().totalHours || 0; });
+        document.getElementById('statTotalHours').textContent = totalHours;
+ 
+        const activitiesSnap = await getDocs(collection(db, 'activities'));
+        document.getElementById('statActivities').textContent = activitiesSnap.size;
+ 
+        const pendingSnap = await getDocs(query(collection(db, 'hourLogs'), where('status', '==', 'pending')));
+        document.getElementById('statPending').textContent = pendingSnap.size;
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  </script>
+ 
+</body>
+</html>
