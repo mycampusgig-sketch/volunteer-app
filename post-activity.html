@@ -136,7 +136,7 @@
         </svg>
       </div>
       <div>
-        <span>ชื่อโครงการ</span>
+        <span id="brandName">ชื่อโครงการ</span>
         <span class="role-tag">แผงควบคุมแอดมิน</span>
       </div>
     </div>
@@ -192,10 +192,6 @@
           <label for="activityType">ประเภทกิจกรรม *</label>
           <select id="activityType">
             <option value="">เลือกประเภทกิจกรรม</option>
-            <option value="environment">สิ่งแวดล้อม</option>
-            <option value="elderly">ผู้สูงอายุ</option>
-            <option value="education">การศึกษา</option>
-            <option value="other">อื่นๆ</option>
           </select>
         </div>
  
@@ -243,6 +239,16 @@
   <script type="module">
     import { auth, db, onAuthStateChanged, signOut, doc, getDoc, addDoc, collection, serverTimestamp } from './firebase-init.js';
  
+    // โหลดชื่อหน่วยงานจากส่วนกลาง (settings/general) มาแสดงในแถบเมนู/หัวข้อ
+    (async () => {
+      try {
+        const s = await getDoc(doc(db, 'settings', 'general'));
+        if (s.exists() && s.data().orgName) {
+          document.querySelectorAll('#brandName').forEach((el) => { el.textContent = s.data().orgName; });
+        }
+      } catch (e) { /* ใช้ชื่อค่าเริ่มต้นถ้าโหลดไม่สำเร็จ */ }
+    })();
+ 
     document.querySelector('.nav-logout').addEventListener('click', async (e) => {
       e.preventDefault();
       await signOut(auth);
@@ -260,6 +266,22 @@
       if (role !== 'admin') {
         alert('หน้านี้สำหรับแอดมินเท่านั้น');
         window.location.href = 'dashboard.html';
+        return;
+      }
+ 
+      // โหลดหมวดหมู่กิจกรรมจากส่วนกลาง (settings/general) มาเป็นตัวเลือกในฟอร์ม
+      try {
+        const s = await getDoc(doc(db, 'settings', 'general'));
+        const categories = (s.exists() && s.data().categories) || ['สิ่งแวดล้อม', 'ผู้สูงอายุ', 'การศึกษา', 'อื่นๆ'];
+        const select = document.getElementById('activityType');
+        categories.forEach((c) => {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.textContent = c;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        console.error(err);
       }
     });
  
@@ -308,3 +330,7 @@
 </body>
 </html>
  
+
+
+
+

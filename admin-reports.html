@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>รายงาน</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+ 
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: #F4F7FC;
+    color: #1B2430;
+    display: flex;
+  }
+ 
+  h1, h2, h3 { font-family: 'Kanit', sans-serif; margin: 0; }
+ 
+  /* ---------- Admin sidebar ---------- */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: #182238;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 8px 24px; margin-bottom: 16px;
+    border-bottom: 1px solid #2A3652;
+  }
+  .brand .logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #2F6FED, #14A38A);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .brand .logo svg { width: 18px; height: 18px; }
+  .brand span { font-family: 'Kanit', sans-serif; font-weight: 700; font-size: 15px; color: #fff; letter-spacing: 0.5px; }
+  .brand .role-tag { font-size: 11px; color: #8AA0C8; margin-top: 2px; display: block; }
+ 
+  nav.nav-list { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #A9B6D0; font-size: 14px; font-weight: 500;
+    text-decoration: none; cursor: pointer;
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: #22304D; color: #fff; }
+  .nav-item.active { background: #2F6FED; color: #fff; }
+ 
+  .nav-logout {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #C88; font-size: 14px; font-weight: 500; cursor: pointer;
+    border-top: 1px solid #2A3652; margin-top: 8px; padding-top: 16px;
+  }
+  .nav-logout svg { width: 18px; height: 18px; }
+  .nav-logout:hover { color: #F08080; }
+ 
+  /* ---------- Main ---------- */
+  main { flex: 1; padding: 28px 36px 48px; max-width: 1000px; }
+ 
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .topbar h2 { font-size: 22px; }
+ 
+  .btn-export {
+    display: flex; align-items: center; gap: 8px;
+    background: #fff; border: 1px solid #E3E8F0; border-radius: 10px;
+    padding: 10px 16px; font-size: 13.5px; font-weight: 600; color: #2F6FED;
+    cursor: pointer; font-family: inherit;
+  }
+  .btn-export svg { width: 16px; height: 16px; }
+  .btn-export:hover { background: #F0F5FF; }
+ 
+  .stat-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px;
+  }
+  .stat-card {
+    background: #fff; border: 1px solid #E3E8F0; border-radius: 16px;
+    padding: 16px 18px;
+  }
+  .stat-num { font-family: 'Kanit', sans-serif; font-size: 22px; font-weight: 700; }
+  .stat-label { font-size: 12.5px; color: #6B7686; margin-top: 4px; }
+ 
+  .section-card {
+    background: #fff; border: 1px solid #E3E8F0; border-radius: 16px;
+    padding: 22px; margin-bottom: 20px;
+  }
+  .section-card h3 { font-size: 15px; margin-bottom: 16px; }
+ 
+  /* ---------- Monthly bar chart (plain divs, no library) ---------- */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; font-size: 12.5px; }
+  .bar-row .month-label { width: 70px; flex-shrink: 0; color: #4B5768; }
+  .bar-track { flex: 1; height: 18px; background: #EEF2F8; border-radius: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, #2F6FED, #14A38A); border-radius: 6px; }
+  .bar-row .bar-num { width: 60px; text-align: right; flex-shrink: 0; color: #1B2430; font-weight: 600; }
+ 
+  /* ---------- Top volunteers list ---------- */
+  .top-list { display: flex; flex-direction: column; gap: 10px; }
+  .top-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid #EEF2F8; font-size: 13.5px;
+  }
+  .top-row:last-child { border-bottom: none; }
+  .top-rank {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #EEF2F8; color: #4B5768; font-weight: 700; font-size: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .top-row.rank1 .top-rank { background: #FFE9B0; color: #A66A00; }
+  .top-row.rank2 .top-rank { background: #E4E9F0; color: #4B5768; }
+  .top-row.rank3 .top-rank { background: #F3D9BE; color: #8A4B10; }
+  .top-name { flex: 1; font-weight: 500; }
+  .top-hours { font-weight: 700; color: #2F6FED; }
+ 
+  .empty-note { color: #A8B4C7; font-size: 13px; }
+ 
+  @media (max-width: 900px) {
+    .stat-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    .sidebar { display: none; }
+    main { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+ 
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.5 1.33 9.6 3.55 11.8L12 20.24l8.45-8.44c2.22-2.2 2.09-5.3.19-7.22Z"></path>
+        </svg>
+      </div>
+      <div>
+        <span id="brandName">ACTIHUB</span>
+        <span class="role-tag">แผงควบคุมแอดมิน</span>
+      </div>
+    </div>
+ 
+    <nav class="nav-list">
+      <a class="nav-item" href="admin-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"></path><path d="M5 10v10h14V10"></path></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="admin-users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        จัดการผู้ใช้
+      </a>
+      <a class="nav-item" href="post-activity.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+        โพสต์งานอาสา
+      </a>
+      <a class="nav-item" href="manage-activities.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18M9 16h6"></path></svg>
+        จัดการงานอาสา
+      </a>
+      <a class="nav-item" href="admin-review-hours.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        ตรวจสอบชั่วโมง
+      </a>
+      <a class="nav-item active" href="admin-reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18 17V9M13 17V5M8 17v-3"></path></svg>
+        รายงาน
+      </a>
+      <a class="nav-item" href="admin-settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg>
+        ตั้งค่า
+      </a>
+    </nav>
+ 
+    <div class="nav-logout" id="logoutBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      ออกจากระบบ
+    </div>
+  </aside>
+ 
+  <main>
+    <div class="topbar">
+      <h2>รายงาน</h2>
+      <button class="btn-export" id="exportBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5 5 5-5"></path><path d="M12 15V3"></path></svg>
+        ดาวน์โหลด CSV
+      </button>
+    </div>
+ 
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-num" id="statTotalApproved">--</div>
+        <div class="stat-label">ชั่วโมงที่อนุมัติแล้วทั้งหมด</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statOpenActivities">--</div>
+        <div class="stat-label">กิจกรรมที่เปิดรับสมัคร</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statClosedActivities">--</div>
+        <div class="stat-label">กิจกรรมที่ปิด/เต็มแล้ว</div>
+      </div>
+    </div>
+ 
+    <div class="section-card">
+      <h3>ชั่วโมงอาสารวมรายเดือน</h3>
+      <div class="bar-chart" id="monthlyChart">
+        <p class="empty-note">กำลังโหลด...</p>
+      </div>
+    </div>
+ 
+    <div class="section-card">
+      <h3>อาสาสมัครชั่วโมงสูงสุด 10 อันดับ</h3>
+      <div class="top-list" id="topList">
+        <p class="empty-note">กำลังโหลด...</p>
+      </div>
+    </div>
+  </main>
+ 
+  <script type="module">
+    import { auth, db, onAuthStateChanged, signOut, doc, getDoc, getDocs, collection, query, where } from './firebase-init.js';
+ 
+    // โหลดชื่อหน่วยงานจากส่วนกลาง (settings/general) มาแสดงในแถบเมนู/หัวข้อ
+    (async () => {
+      try {
+        const s = await getDoc(doc(db, 'settings', 'general'));
+        if (s.exists() && s.data().orgName) {
+          document.querySelectorAll('#brandName').forEach((el) => { el.textContent = s.data().orgName; });
+        }
+      } catch (e) { /* ใช้ชื่อค่าเริ่มต้นถ้าโหลดไม่สำเร็จ */ }
+    })();
+ 
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = 'login.html';
+    });
+ 
+    let approvedLogsCache = [];
+ 
+    function exportCsv() {
+      if (!approvedLogsCache.length) {
+        alert('ยังไม่มีข้อมูลชั่วโมงที่อนุมัติแล้วให้ export');
+        return;
+      }
+      const header = ['ชื่อผู้ใช้', 'อีเมล', 'กิจกรรม', 'วันที่', 'ชั่วโมง'];
+      const rows = approvedLogsCache.map((r) => [r.userName, r.userEmail, r.activityName, r.date, r.hours]);
+      const csvContent = [header, ...rows]
+        .map((row) => row.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `actihub-hours-report-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    document.getElementById('exportBtn').addEventListener('click', exportCsv);
+ 
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      const userSnap = await getDoc(doc(db, 'users', user.uid));
+      const role = userSnap.exists() ? userSnap.data().role : 'user';
+      if (role !== 'admin') {
+        alert('หน้านี้สำหรับแอดมินเท่านั้น');
+        window.location.href = 'dashboard.html';
+        return;
+      }
+ 
+      try {
+        // ---------- โหลดชั่วโมงที่อนุมัติแล้วทั้งหมด ----------
+        const approvedSnap = await getDocs(query(collection(db, 'hourLogs'), where('status', '==', 'done')));
+        const usersSnap = await getDocs(collection(db, 'users'));
+        const userMap = {};
+        usersSnap.forEach((d) => { userMap[d.id] = d.data(); });
+ 
+        let totalApproved = 0;
+        const monthlyTotals = {};
+        const perUserTotals = {};
+ 
+        approvedLogsCache = approvedSnap.docs.map((d) => {
+          const log = d.data();
+          const hours = log.hours || 0;
+          totalApproved += hours;
+ 
+          const monthKey = (log.date || '').slice(0, 7) || 'ไม่ระบุ';
+          monthlyTotals[monthKey] = (monthlyTotals[monthKey] || 0) + hours;
+ 
+          perUserTotals[log.userId] = (perUserTotals[log.userId] || 0) + hours;
+ 
+          const u = userMap[log.userId] || {};
+          return {
+            userName: u.name || log.userId,
+            userEmail: u.email || '',
+            activityName: log.activityName || '',
+            date: log.date || '',
+            hours,
+          };
+        });
+ 
+        document.getElementById('statTotalApproved').textContent = `${totalApproved} ชม.`;
+ 
+        // ---------- กราฟรายเดือน ----------
+        const monthKeys = Object.keys(monthlyTotals).sort();
+        const chartEl = document.getElementById('monthlyChart');
+        if (!monthKeys.length) {
+          chartEl.innerHTML = '<p class="empty-note">ยังไม่มีข้อมูลชั่วโมงที่อนุมัติแล้ว</p>';
+        } else {
+          const maxVal = Math.max(...monthKeys.map((k) => monthlyTotals[k]));
+          chartEl.innerHTML = monthKeys.map((k) => {
+            const val = monthlyTotals[k];
+            const pct = maxVal > 0 ? (val / maxVal) * 100 : 0;
+            return `
+              <div class="bar-row">
+                <span class="month-label">${k}</span>
+                <div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div>
+                <span class="bar-num">${val} ชม.</span>
+              </div>`;
+          }).join('');
+        }
+ 
+        // ---------- Top 10 อาสาสมัคร ----------
+        const topList = document.getElementById('topList');
+        const ranked = Object.entries(perUserTotals)
+          .map(([uid, hours]) => ({ uid, hours, name: (userMap[uid] || {}).name || uid }))
+          .sort((a, b) => b.hours - a.hours)
+          .slice(0, 10);
+ 
+        if (!ranked.length) {
+          topList.innerHTML = '<p class="empty-note">ยังไม่มีข้อมูล</p>';
+        } else {
+          topList.innerHTML = ranked.map((r, i) => `
+            <div class="top-row ${i === 0 ? 'rank1' : i === 1 ? 'rank2' : i === 2 ? 'rank3' : ''}">
+              <div class="top-rank">${i + 1}</div>
+              <div class="top-name">${r.name}</div>
+              <div class="top-hours">${r.hours} ชม.</div>
+            </div>`).join('');
+        }
+ 
+        // ---------- สถิติกิจกรรม ----------
+        const activitiesSnap = await getDocs(collection(db, 'activities'));
+        let openCount = 0, closedCount = 0;
+        activitiesSnap.forEach((d) => {
+          const a = d.data();
+          if (a.status === 'open') openCount++; else closedCount++;
+        });
+        document.getElementById('statOpenActivities').textContent = openCount;
+        document.getElementById('statClosedActivities').textContent = closedCount;
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  </script>
+ 
+</body>
+</html>
+ 

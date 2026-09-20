@@ -151,7 +151,7 @@
           <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.5 1.33 9.6 3.55 11.8L12 20.24l8.45-8.44c2.22-2.2 2.09-5.3.19-7.22Z"></path>
         </svg>
       </div>
-      <span>ชื่อโครงการ</span>
+      <span id="brandName">ชื่อโครงการ</span>
     </div>
  
     <nav class="nav-list">
@@ -231,6 +231,16 @@
  
   <script type="module">
     import { auth, db, onAuthStateChanged, signOut, doc, getDoc, collection, query, where, orderBy, getDocs } from './firebase-init.js';
+ 
+    // โหลดชื่อหน่วยงานจากส่วนกลาง (settings/general) มาแสดงในแถบเมนู/หัวข้อ
+    (async () => {
+      try {
+        const s = await getDoc(doc(db, 'settings', 'general'));
+        if (s.exists() && s.data().orgName) {
+          document.querySelectorAll('#brandName').forEach((el) => { el.textContent = s.data().orgName; });
+        }
+      } catch (e) { /* ใช้ชื่อค่าเริ่มต้นถ้าโหลดไม่สำเร็จ */ }
+    })();
  
     document.querySelector('.nav-logout').addEventListener('click', async (e) => {
       e.preventDefault();

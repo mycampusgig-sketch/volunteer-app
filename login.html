@@ -140,7 +140,7 @@
     </style>
     </head>
     <body>
-
+ 
     <div>
   <div class="card">
     <div class="card-inner">
@@ -149,9 +149,9 @@
           <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.5 1.33 9.6 3.55 11.8L12 20.24l8.45-8.44c2.22-2.2 2.09-5.3.19-7.22Z"></path>
         </svg>
       </div>
-      <h1>ACTIHUB</h1>
+      <h1 id="brandName">ชื่อโครงการ</h1>
       <p class="subtitle">ระบบบันทึกกิจกรรม</p>
-
+ 
       <form id="loginForm">
         <div class="field">
           <label for="email">อีเมล / ชื่อผู้ใช้</label>
@@ -163,7 +163,7 @@
             <input type="text" id="email" placeholder="กรอกอีเมลหรือชื่อผู้ใช้" />
           </div>
         </div>
-
+ 
         <div class="field">
           <label for="password">รหัสผ่าน</label>
           <div class="input-wrap">
@@ -180,7 +180,7 @@
             </button>
           </div>
         </div>
-
+ 
         <div class="row-between">
           <label class="remember">
             <input type="checkbox" id="remember" />
@@ -188,32 +188,42 @@
           </label>
           <button type="button" class="forgot">ลืมรหัสผ่าน?</button>
         </div>
-
+ 
         <div class="notice" id="notice"></div>
-
+ 
         <button type="submit" class="btn-primary">เข้าสู่ระบบ</button>
       </form>
-
+ 
       <div class="divider">
         <div class="line"></div>
         <span>หรือ</span>
         <div class="line"></div>
       </div>
-
+ 
       <button type="button" class="btn-secondary" onclick="window.location.href='register.html'">สมัครสมาชิก</button>
     </div>
-
+ 
     <svg viewBox="0 0 400 90" style="width:100%; display:block; height:60px;" preserveAspectRatio="none">
       <path d="M0,60 C80,20 140,80 220,40 C290,10 340,50 400,25 L400,90 L0,90 Z" fill="#DCEBFF"></path>
       <path d="M0,75 C90,45 160,90 240,55 C310,28 350,65 400,50 L400,90 L0,90 Z" fill="#C6E6DC" opacity="0.8"></path>
     </svg>
   </div>
-
+ 
   <p class="footer-note">เทมเพลตสำหรับมูลนิธิ — ยังไม่มีข้อมูลจริง พร้อมให้ปรับแต่งและเชื่อมต่อระบบต่อได้</p>
 </div>
-
+ 
 <script type="module">
-  import { auth, signInWithEmailAndPassword } from './firebase-init.js';
+  import { auth, db, doc, getDoc, signInWithEmailAndPassword } from './firebase-init.js';
+ 
+  // โหลดชื่อหน่วยงานจากส่วนกลาง (settings/general) มาแสดงบนหน้า login
+  (async () => {
+    try {
+      const s = await getDoc(doc(db, 'settings', 'general'));
+      if (s.exists() && s.data().orgName) {
+        document.querySelectorAll('#brandName').forEach((el) => { el.textContent = s.data().orgName; });
+      }
+    } catch (e) { /* ใช้ชื่อค่าเริ่มต้นถ้าโหลดไม่สำเร็จ */ }
+  })();
  
   const toggleEye = document.getElementById('toggleEye');
   const password = document.getElementById('password');
@@ -275,3 +285,4 @@
     
 </body>
 </html>
+ 

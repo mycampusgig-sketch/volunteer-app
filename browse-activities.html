@@ -180,7 +180,7 @@
           <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.5 1.33 9.6 3.55 11.8L12 20.24l8.45-8.44c2.22-2.2 2.09-5.3.19-7.22Z"></path>
         </svg>
       </div>
-      <span>ชื่อโครงการ</span>
+      <span id="brandName">ชื่อโครงการ</span>
     </div>
  
     <nav class="nav-list">
@@ -236,13 +236,8 @@
       </button>
     </div>
  
-    <div class="pill-row">
-      <div class="pill active">ทั้งหมด</div>
-      <div class="pill">ใกล้ฉัน</div>
-      <div class="pill">ผู้สูงอายุ</div>
-      <div class="pill">การศึกษา</div>
-      <div class="pill">สิ่งแวดล้อม</div>
-      <div class="pill">อื่นๆ</div>
+    <div class="pill-row" id="pillRow">
+      <div class="pill active" data-cat="all">ทั้งหมด</div>
     </div>
  
     <div class="activity-grid" id="activityGrid">
@@ -259,11 +254,72 @@
   <script type="module">
     import { auth, db, onAuthStateChanged, signOut, doc, getDoc, collection, getDocs, orderBy, query } from './firebase-init.js';
  
+    // โหลดชื่อหน่วยงานจากส่วนกลาง (settings/general) มาแสดงในแถบเมนู/หัวข้อ
+    (async () => {
+      try {
+        const s = await getDoc(doc(db, 'settings', 'general'));
+        if (s.exists() && s.data().orgName) {
+          document.querySelectorAll('#brandName').forEach((el) => { el.textContent = s.data().orgName; });
+        }
+      } catch (e) { /* ใช้ชื่อค่าเริ่มต้นถ้าโหลดไม่สำเร็จ */ }
+    })();
+ 
     document.querySelector('.nav-logout').addEventListener('click', async (e) => {
       e.preventDefault();
       await signOut(auth);
       window.location.href = 'login.html';
     });
+ 
+    let allActivities = [];
+ 
+    function renderGrid(filterCat) {
+      const grid = document.getElementById('activityGrid');
+      const list = filterCat === 'all' ? allActivities : allActivities.filter((a) => a.type === filterCat);
+ 
+      if (!list.length) {
+        grid.innerHTML = '<p style="color:#A8B4C7; font-size:13px;">ไม่มีงานอาสาในหมวดหมู่นี้</p>';
+        return;
+      }
+ 
+      grid.innerHTML = list.map((a) => `
+        <div class="activity-card">
+          <img src="${a.imageUrl || 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=200&h=200&fit=crop'}" alt="">
+          <div class="activity-body">
+            <div class="activity-title">${a.name || '-'}</div>
+            <div class="activity-org">${a.place || ''}</div>
+            <div class="activity-meta">
+              <span>${a.date || '-'}</span>
+              <span>${a.time || ''}</span>
+              <span>${a.hours || 0} ชม.</span>
+            </div>
+          </div>
+          <div class="activity-side">
+            <span class="spots-left">รับ ${a.spots || 0} คน / มีผู้จอง ${a.applicants || 0} คน</span>
+            <button class="btn-detail" onclick="window.location.href='activity-detail.html?id=${a.id}'">ดูรายละเอียด</button>
+          </div>
+        </div>`).join('');
+    }
+ 
+    async function loadCategoriesAndPills() {
+      const pillRow = document.getElementById('pillRow');
+      try {
+        const s = await getDoc(doc(db, 'settings', 'general'));
+        const categories = (s.exists() && s.data().categories) || ['สิ่งแวดล้อม', 'ผู้สูงอายุ', 'การศึกษา', 'อื่นๆ'];
+ 
+        pillRow.innerHTML = `<div class="pill active" data-cat="all">ทั้งหมด</div>` +
+          categories.map((c) => `<div class="pill" data-cat="${c}">${c}</div>`).join('');
+ 
+        pillRow.querySelectorAll('.pill').forEach((pill) => {
+          pill.addEventListener('click', () => {
+            pillRow.querySelectorAll('.pill').forEach((p) => p.classList.remove('active'));
+            pill.classList.add('active');
+            renderGrid(pill.dataset.cat);
+          });
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
  
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -276,6 +332,8 @@
         document.getElementById('adminLink').style.display = 'flex';
       }
  
+      loadCategoriesAndPills();
+ 
       const grid = document.getElementById('activityGrid');
       try {
         const q = query(collection(db, 'activities'), orderBy('date', 'asc'));
@@ -286,26 +344,8 @@
           return;
         }
  
-        grid.innerHTML = snap.docs.map((d) => {
-          const a = d.data();
-          return `
-            <div class="activity-card">
-              <img src="${a.imageUrl || 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=200&h=200&fit=crop'}" alt="">
-              <div class="activity-body">
-                <div class="activity-title">${a.name || '-'}</div>
-                <div class="activity-org">${a.place || ''}</div>
-                <div class="activity-meta">
-                  <span>${a.date || '-'}</span>
-                  <span>${a.time || ''}</span>
-                  <span>${a.hours || 0} ชม.</span>
-                </div>
-              </div>
-              <div class="activity-side">
-                <span class="spots-left">รับ ${a.spots || 0} คน / มีผู้จอง ${a.applicants || 0} คน</span>
-                <button class="btn-detail" onclick="window.location.href='activity-detail.html?id=${d.id}'">ดูรายละเอียด</button>
-              </div>
-            </div>`;
-        }).join('');
+        allActivities = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        renderGrid('all');
       } catch (err) {
         grid.innerHTML = '<p style="color:#D64545; font-size:13px;">โหลดข้อมูลไม่สำเร็จ</p>';
         console.error(err);

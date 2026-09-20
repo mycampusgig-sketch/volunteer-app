@@ -131,7 +131,7 @@
         </svg>
       </div>
       <div>
-        <span>ชื่อโครงการ</span>
+        <span id="brandName">ชื่อโครงการ</span>
         <span class="role-tag">แผงควบคุมแอดมิน</span>
       </div>
     </div>
@@ -193,6 +193,16 @@
  
   <script type="module">
     import { auth, db, onAuthStateChanged, signOut, doc, getDoc, updateDoc, collection, getDocs } from './firebase-init.js';
+ 
+    // โหลดชื่อหน่วยงานจากส่วนกลาง (settings/general) มาแสดงในแถบเมนู/หัวข้อ
+    (async () => {
+      try {
+        const s = await getDoc(doc(db, 'settings', 'general'));
+        if (s.exists() && s.data().orgName) {
+          document.querySelectorAll('#brandName').forEach((el) => { el.textContent = s.data().orgName; });
+        }
+      } catch (e) { /* ใช้ชื่อค่าเริ่มต้นถ้าโหลดไม่สำเร็จ */ }
+    })();
  
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       await signOut(auth);

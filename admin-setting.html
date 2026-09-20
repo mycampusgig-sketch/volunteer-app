@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตั้งค่าระบบ</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+ 
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: #F4F7FC;
+    color: #1B2430;
+    display: flex;
+  }
+ 
+  h1, h2, h3 { font-family: 'Kanit', sans-serif; margin: 0; }
+ 
+  /* ---------- Admin sidebar ---------- */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: #182238;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 8px 24px; margin-bottom: 16px;
+    border-bottom: 1px solid #2A3652;
+  }
+  .brand .logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #2F6FED, #14A38A);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .brand .logo svg { width: 18px; height: 18px; }
+  .brand span { font-family: 'Kanit', sans-serif; font-weight: 700; font-size: 15px; color: #fff; letter-spacing: 0.5px; }
+  .brand .role-tag { font-size: 11px; color: #8AA0C8; margin-top: 2px; display: block; }
+ 
+  nav.nav-list { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #A9B6D0; font-size: 14px; font-weight: 500;
+    text-decoration: none; cursor: pointer;
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: #22304D; color: #fff; }
+  .nav-item.active { background: #2F6FED; color: #fff; }
+ 
+  .nav-logout {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #C88; font-size: 14px; font-weight: 500; cursor: pointer;
+    border-top: 1px solid #2A3652; margin-top: 8px; padding-top: 16px;
+  }
+  .nav-logout svg { width: 18px; height: 18px; }
+  .nav-logout:hover { color: #F08080; }
+ 
+  /* ---------- Main ---------- */
+  main { flex: 1; padding: 28px 36px 48px; max-width: 680px; }
+  .topbar h2 { font-size: 22px; margin-bottom: 22px; }
+ 
+  .section-card {
+    background: #fff; border: 1px solid #E3E8F0; border-radius: 16px;
+    padding: 24px; margin-bottom: 18px;
+  }
+  .section-card h3 { font-size: 15px; margin-bottom: 4px; }
+  .section-card .sub { font-size: 12.5px; color: #6B7686; margin-bottom: 18px; }
+ 
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .field input {
+    width: 100%; border: 1px solid #E3E8F0; border-radius: 10px;
+    padding: 10px 12px; font-size: 14px; font-family: inherit;
+    color: #1B2430; background: #F8FAFD;
+  }
+  .field input:focus { outline: none; border-color: #2F6FED; background: #fff; }
+ 
+  .btn-save {
+    padding: 11px 22px; border: none; border-radius: 10px;
+    background: #2F6FED; color: #fff; font-size: 14px; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+  }
+  .btn-save:hover { background: #1F4FC4; }
+ 
+  /* ---------- Category tags ---------- */
+  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .tag-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: #EEF2F8; color: #4B5768; font-size: 13px; font-weight: 500;
+    padding: 6px 10px 6px 12px; border-radius: 999px;
+  }
+  .tag-chip button {
+    background: none; border: none; color: #8A99B3; cursor: pointer;
+    font-size: 14px; line-height: 1; padding: 0;
+  }
+  .tag-chip button:hover { color: #D64545; }
+ 
+  .add-tag-row { display: flex; gap: 8px; }
+  .add-tag-row input {
+    flex: 1; border: 1px solid #E3E8F0; border-radius: 10px;
+    padding: 9px 12px; font-size: 14px; font-family: inherit; background: #F8FAFD;
+  }
+  .add-tag-row input:focus { outline: none; border-color: #2F6FED; background: #fff; }
+  .btn-add-tag {
+    padding: 9px 16px; border: 1px solid #2F6FED; border-radius: 10px;
+    background: #fff; color: #2F6FED; font-size: 13.5px; font-weight: 600;
+    font-family: inherit; cursor: pointer; white-space: nowrap;
+  }
+  .btn-add-tag:hover { background: #F0F5FF; }
+ 
+  .notice {
+    display: none; font-size: 13px; padding: 10px 12px;
+    border-radius: 8px; margin-bottom: 14px;
+  }
+ 
+  @media (max-width: 760px) {
+    .sidebar { display: none; }
+    main { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+ 
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.5 1.33 9.6 3.55 11.8L12 20.24l8.45-8.44c2.22-2.2 2.09-5.3.19-7.22Z"></path>
+        </svg>
+      </div>
+      <div>
+        <span id="brandName">ACTIHUB</span>
+        <span class="role-tag">แผงควบคุมแอดมิน</span>
+      </div>
+    </div>
+ 
+    <nav class="nav-list">
+      <a class="nav-item" href="admin-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"></path><path d="M5 10v10h14V10"></path></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="admin-users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        จัดการผู้ใช้
+      </a>
+      <a class="nav-item" href="post-activity.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+        โพสต์งานอาสา
+      </a>
+      <a class="nav-item" href="manage-activities.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18M9 16h6"></path></svg>
+        จัดการงานอาสา
+      </a>
+      <a class="nav-item" href="admin-review-hours.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        ตรวจสอบชั่วโมง
+      </a>
+      <a class="nav-item" href="admin-reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18 17V9M13 17V5M8 17v-3"></path></svg>
+        รายงาน
+      </a>
+      <a class="nav-item active" href="admin-settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg>
+        ตั้งค่า
+      </a>
+    </nav>
+ 
+    <div class="nav-logout" id="logoutBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      ออกจากระบบ
+    </div>
+  </aside>
+ 
+  <main>
+    <div class="topbar"><h2>ตั้งค่าระบบ</h2></div>
+ 
+    <div class="notice" id="notice"></div>
+ 
+    <div class="section-card">
+      <h3>ข้อมูลทั่วไป</h3>
+      <p class="sub">ค่าเหล่านี้มีผลกับสมาชิกและหน้าเว็บทั้งหมด</p>
+ 
+      <form id="generalForm">
+        <div class="field">
+          <label for="orgName">ชื่อหน่วยงาน/โครงการ</label>
+          <input type="text" id="orgName" placeholder="เช่น ACTIHUB - ฝ่ายกิจการนักศึกษา">
+        </div>
+        <div class="field">
+          <label for="defaultTarget">เป้าหมายชั่วโมงเริ่มต้นของสมาชิกใหม่</label>
+          <input type="number" id="defaultTarget" min="1" placeholder="เช่น 60">
+        </div>
+        <button type="submit" class="btn-save">บันทึกข้อมูลทั่วไป</button>
+      </form>
+    </div>
+ 
+    <div class="section-card">
+      <h3>หมวดหมู่กิจกรรม</h3>
+      <p class="sub">ใช้เป็นตัวเลือกในหน้าโพสต์งานอาสา และปุ่มกรองในหน้ารับงานอาสา</p>
+ 
+      <div class="tag-list" id="tagList">
+        <p class="sub">กำลังโหลด...</p>
+      </div>
+ 
+      <div class="add-tag-row">
+        <input type="text" id="newTagInput" placeholder="พิมพ์ชื่อหมวดหมู่ใหม่">
+        <button class="btn-add-tag" id="addTagBtn">+ เพิ่มหมวดหมู่</button>
+      </div>
+    </div>
+ 
+    <div class="section-card">
+      <h3>เปลี่ยนรหัสผ่านแอดมิน</h3>
+      <p class="sub">เปลี่ยนรหัสผ่านของบัญชีแอดมินที่ล็อกอินอยู่ตอนนี้</p>
+ 
+      <form id="passwordForm">
+        <div class="field">
+          <label for="currentPw">รหัสผ่านปัจจุบัน</label>
+          <input type="password" id="currentPw" placeholder="กรอกรหัสผ่านปัจจุบัน">
+        </div>
+        <div class="field">
+          <label for="newPw">รหัสผ่านใหม่</label>
+          <input type="password" id="newPw" placeholder="อย่างน้อย 6 ตัวอักษร">
+        </div>
+        <button type="submit" class="btn-save">เปลี่ยนรหัสผ่าน</button>
+      </form>
+    </div>
+  </main>
+ 
+  <script type="module">
+    import {
+      auth, db, onAuthStateChanged, signOut, doc, getDoc, setDoc,
+      EmailAuthProvider, reauthenticateWithCredential, updatePassword,
+    } from './firebase-init.js';
+ 
+    // โหลดชื่อหน่วยงานจากส่วนกลาง (settings/general) มาแสดงในแถบเมนู/หัวข้อ
+    (async () => {
+      try {
+        const s = await getDoc(doc(db, 'settings', 'general'));
+        if (s.exists() && s.data().orgName) {
+          document.querySelectorAll('#brandName').forEach((el) => { el.textContent = s.data().orgName; });
+        }
+      } catch (e) { /* ใช้ชื่อค่าเริ่มต้นถ้าโหลดไม่สำเร็จ */ }
+    })();
+ 
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = 'login.html';
+    });
+ 
+    const notice = document.getElementById('notice');
+    function showNotice(msg, isError) {
+      notice.textContent = msg;
+      notice.style.display = 'block';
+      notice.style.background = isError ? '#FDECEC' : '#E7F7F1';
+      notice.style.color = isError ? '#D64545' : '#14A38A';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+ 
+    const SETTINGS_DOC = doc(db, 'settings', 'general');
+    let categories = [];
+ 
+    function renderTags() {
+      const tagList = document.getElementById('tagList');
+      if (!categories.length) {
+        tagList.innerHTML = '<p class="sub">ยังไม่มีหมวดหมู่ เพิ่มได้ด้านล่าง</p>';
+        return;
+      }
+      tagList.innerHTML = categories.map((cat, i) => `
+        <span class="tag-chip">
+          ${cat}
+          <button data-index="${i}" aria-label="ลบ">×</button>
+        </span>`).join('');
+ 
+      tagList.querySelectorAll('button').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          categories.splice(parseInt(btn.dataset.index, 10), 1);
+          renderTags();
+          try {
+            await setDoc(SETTINGS_DOC, { categories }, { merge: true });
+          } catch (err) {
+            showNotice('ลบหมวดหมู่ไม่สำเร็จ: ' + err.message, true);
+          }
+        });
+      });
+    }
+ 
+    document.getElementById('addTagBtn').addEventListener('click', async () => {
+      const input = document.getElementById('newTagInput');
+      const val = input.value.trim();
+      if (!val) return;
+      if (categories.includes(val)) {
+        showNotice('มีหมวดหมู่นี้อยู่แล้ว', true);
+        return;
+      }
+      categories.push(val);
+      renderTags();
+      input.value = '';
+      try {
+        await setDoc(SETTINGS_DOC, { categories }, { merge: true });
+      } catch (err) {
+        showNotice('เพิ่มหมวดหมู่ไม่สำเร็จ: ' + err.message, true);
+      }
+    });
+ 
+    document.getElementById('generalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const orgName = document.getElementById('orgName').value.trim();
+      const defaultTarget = parseInt(document.getElementById('defaultTarget').value, 10);
+ 
+      if (!orgName || !defaultTarget || defaultTarget < 1) {
+        showNotice('กรอกข้อมูลให้ครบและถูกต้องก่อนนะครับ', true);
+        return;
+      }
+ 
+      try {
+        await setDoc(SETTINGS_DOC, { orgName, defaultTargetHours: defaultTarget }, { merge: true });
+        showNotice('บันทึกข้อมูลทั่วไปเรียบร้อยแล้ว', false);
+      } catch (err) {
+        showNotice('บันทึกไม่สำเร็จ: ' + err.message, true);
+      }
+    });
+ 
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const currentPw = document.getElementById('currentPw').value;
+      const newPw = document.getElementById('newPw').value;
+      const user = auth.currentUser;
+ 
+      if (!currentPw || !newPw) {
+        showNotice('กรอกรหัสผ่านให้ครบก่อนนะครับ', true);
+        return;
+      }
+      if (newPw.length < 6) {
+        showNotice('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร', true);
+        return;
+      }
+ 
+      try {
+        const credential = EmailAuthProvider.credential(user.email, currentPw);
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, newPw);
+        showNotice('เปลี่ยนรหัสผ่านเรียบร้อยแล้ว', false);
+        e.target.reset();
+      } catch (err) {
+        showNotice(err.code === 'auth/wrong-password' ? 'รหัสผ่านปัจจุบันไม่ถูกต้อง' : 'เปลี่ยนรหัสผ่านไม่สำเร็จ: ' + err.message, true);
+      }
+    });
+ 
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      const userSnap = await getDoc(doc(db, 'users', user.uid));
+      const role = userSnap.exists() ? userSnap.data().role : 'user';
+      if (role !== 'admin') {
+        alert('หน้านี้สำหรับแอดมินเท่านั้น');
+        window.location.href = 'dashboard.html';
+        return;
+      }
+ 
+      try {
+        const settingsSnap = await getDoc(SETTINGS_DOC);
+        const s = settingsSnap.exists() ? settingsSnap.data() : {};
+        document.getElementById('orgName').value = s.orgName || 'ACTIHUB';
+        document.getElementById('defaultTarget').value = s.defaultTargetHours || 60;
+        categories = s.categories || ['สิ่งแวดล้อม', 'ผู้สูงอายุ', 'การศึกษา', 'อื่นๆ'];
+        renderTags();
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  </script>
+ 
+</body>
+</html>
+ 
+
+
+
+
